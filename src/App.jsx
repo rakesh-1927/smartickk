@@ -9,38 +9,14 @@ import Attendance from "./page/Attendance";
 import SuccessPage from "./page/SuccessPage";
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <LandingPage />,
-  },
-  {
-    path: "/registerLecturer",
-    element: <RegisterLecturer />,
-  },
-  {
-    path: "/loginLecturer",
-    element: <LoginLecturer />,
-  },
-  {
-    path: "/classDetails",
-    element: <ClassDetails />,
-  },
-  {
-    path: "/classSchedule",
-    element: <ClassSchedule />,
-  },
-  {
-    path: "/previousClass",
-    element: <PreviousClass />,
-  },
-  {
-    path: "/attendance",
-    element: <Attendance />,
-  },
-  {
-    path: "/success",
-    element: <SuccessPage />,
-  },
+  { path: "/", element: <LandingPage /> },
+  { path: "/registerLecturer", element: <RegisterLecturer /> },
+  { path: "/loginLecturer", element: <LoginLecturer /> },
+  { path: "/classDetails", element: <ClassDetails /> },
+  { path: "/classSchedule", element: <ClassSchedule /> },
+  { path: "/previousClass", element: <PreviousClass /> }, // Fixed consistency
+  { path: "/attendance", element: <Attendance /> },
+  { path: "/success", element: <SuccessPage /> },
 ]);
 
 function App() {

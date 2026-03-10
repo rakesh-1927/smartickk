@@ -1,7 +1,7 @@
 function Spinner() {
   return (
     <section className={`flex items-center justify-center`}>
-      <div className="loading loading-spinner  bg-white"></div>
+      <div className="loading loading-spinner bg-white"></div>
     </section>
   );
 }

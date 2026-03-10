@@ -1,6 +1,5 @@
-// useLogout.js
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../utils/supabaseClient"; // Adjust the path as needed
+import { supabase } from "../utils/supabaseClient";
 import toast from "react-hot-toast";
 
 const useLogout = () => {

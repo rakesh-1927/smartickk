@@ -1,4 +1,3 @@
-// distanceCalculation.js
 export const calculateDistance = (lat1, lon1, lat2, lon2) => {
   const R = 6371e3; // Earth radius in meters
   const toRad = (degree) => (degree * Math.PI) / 180;

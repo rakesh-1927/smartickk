@@ -9,7 +9,6 @@ const useUserDetails = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        // Get current session
         const {
           data: { session },
           error: sessionError,
@@ -17,7 +16,6 @@ const useUserDetails = () => {
 
         if (sessionError) throw sessionError;
 
-        // Check if user is logged in
         if (!session || !session.user) {
           setError("User is not logged in.");
           return;
@@ -25,10 +23,9 @@ const useUserDetails = () => {
 
         const userEmail = session.user.email;
 
-        // Fetch lecturer details from Supabase
         const { data: userData, error: userError } = await supabase
           .from("lecturers")
-          .select("id, fullName, email, phone_number, created_at")
+          .select("id, full_name, email, phone_number, created_at") // Changed fullName to full_name to match SQL
           .eq("email", userEmail)
           .single();
 
@@ -39,10 +36,9 @@ const useUserDetails = () => {
             throw userError;
           }
         } else if (userData) {
-          // ✅ Store user details in a clean structure
           setUserDetails({
-            lecturer_id: userData.id, // important for linking with classes
-            fullName: userData.fullName,
+            lecturer_id: userData.id,
+            fullName: userData.full_name, // Map back to camelCase for frontend consistency
             email: userData.email,
             phone_number: userData.phone_number,
             created_at: userData.created_at,
