@@ -9,7 +9,8 @@ import { Link } from "react-router-dom";
 import Footer from "../component/Footer";
 import logo from "../assets/smartickk.png";
 
-const VERCEL_URL = import.meta.env.VITE_VERCEL_URL || "http://localhost:5173";
+// This automatically uses the current domain (localhost OR vercel URL)
+const VERCEL_URL = window.location.origin;
 
 const ClassSchedule = () => {
   const { userDetails } = useUserDetails();
