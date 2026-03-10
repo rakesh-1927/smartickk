@@ -5,7 +5,6 @@ import Input from "../component/Input";
 import { supabase } from "../utils/supabaseClient";
 import toast from "react-hot-toast";
 import Spinner from "../component/Spinner";
-import dayjs from "dayjs";
 import logo from "../assets/smartickk.png";
 
 const Attendance = () => {
@@ -26,9 +25,8 @@ const Attendance = () => {
 
   useEffect(() => {
     const fetchClassDetails = async () => {
-        // We can verify class exists, but for simplicity we trust the URL params for lat/lng
         if(courseId) {
-            const { data } = await supabase.from("classes").select("*").eq("course_id", courseId).single();
+            const { data } = await supabase.from("classes").select("course_title, location_name").eq("course_id", courseId).single();
             setClassDetails(data);
         }
     };
@@ -52,21 +50,30 @@ const Attendance = () => {
     if (!matricNumber || !name) return toast.error("Fill all fields");
     setIsLoading(true);
 
-    const { data, error } = await supabase.from("classes").select("attendance").eq("course_id", courseId).single();
-    if (error) { setIsLoading(false); return toast.error("Error fetching class"); }
+    try {
+      // --- CHANGED: Use the secure RPC function ---
+      const { error } = await supabase.rpc('mark_attendance', {
+        p_course_id: courseId,
+        p_student: {
+            matric_no: matricNumber.toUpperCase(), 
+            name: name.toUpperCase(), 
+            timestamp: new Date().toISOString()
+        }
+      });
 
-    const attendance = data?.attendance || [];
-    if (attendance.some((a) => a.matric_no === matricNumber.toUpperCase())) {
-        setIsLoading(false); return toast.error("Already registered");
+      if (error) {
+        // This catches the "Already marked" error from SQL or other DB errors
+        toast.error(error.message);
+      } else {
+        toast.success("Attendance Marked Successfully!");
+        navigate("/success");
+      }
+    } catch (err) {
+        toast.error("An unexpected error occurred");
+        console.error(err);
+    } finally {
+        setIsLoading(false);
     }
-
-    const updated = [...attendance, { matric_no: matricNumber.toUpperCase(), name: name.toUpperCase(), timestamp: new Date().toISOString() }];
-    
-    const { error: updateError } = await supabase.from("classes").update({ attendance: updated }).eq("course_id", courseId);
-    
-    if (updateError) toast.error(updateError.message);
-    else { toast.success("Success"); navigate("/success"); }
-    setIsLoading(false);
   };
 
   return (
