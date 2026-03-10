@@ -18,11 +18,24 @@ const Attendance = () => {
   const [classDetails, setClassDetails] = useState(null);
   const [matricNumber, setMatricNumber] = useState("");
   const [name, setName] = useState("");
+  const [deviceId, setDeviceId] = useState(""); // New state for Device ID
 
   const courseId = queryParams.get("courseId");
   const lat = parseFloat(queryParams.get("lat"));
   const lng = parseFloat(queryParams.get("lng"));
 
+  // 1. Effect to Get/Create Device ID (Fingerprint)
+  useEffect(() => {
+    let storedDeviceId = localStorage.getItem("smartick_device_id");
+    if (!storedDeviceId) {
+      // Generate a unique ID (UUID)
+      storedDeviceId = crypto.randomUUID();
+      localStorage.setItem("smartick_device_id", storedDeviceId);
+    }
+    setDeviceId(storedDeviceId);
+  }, []);
+
+  // 2. Effect to Fetch Class Details
   useEffect(() => {
     const fetchClassDetails = async () => {
         if(courseId) {
@@ -33,6 +46,7 @@ const Attendance = () => {
     fetchClassDetails();
   }, [courseId]);
 
+  // 3. Effect to Check Location
   useEffect(() => {
     if (!lat || !lng) return;
     navigator.geolocation.getCurrentPosition(
@@ -41,28 +55,30 @@ const Attendance = () => {
         setUserDistance(distance);
         setIsWithinRange(distance <= 100); // 100 meters
       },
-      (err) => toast.error(err.message)
+      (err) => toast.error("Location permission denied.")
     );
   }, [lat, lng]);
 
   const handleRegister = async (e) => {
     e.preventDefault();
     if (!matricNumber || !name) return toast.error("Fill all fields");
+    if (!deviceId) return toast.error("Device ID not ready. Please wait.");
     setIsLoading(true);
 
     try {
-      // --- CHANGED: Use the secure RPC function ---
+      // --- CALL THE SECURE FUNCTION ---
       const { error } = await supabase.rpc('mark_attendance', {
         p_course_id: courseId,
         p_student: {
             matric_no: matricNumber.toUpperCase(), 
             name: name.toUpperCase(), 
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            device_id: deviceId // Pass the Device ID here
         }
       });
 
       if (error) {
-        // This catches the "Already marked" error from SQL or other DB errors
+        // This will show "Attendance already marked from this device..."
         toast.error(error.message);
       } else {
         toast.success("Attendance Marked Successfully!");
